@@ -1,0 +1,34 @@
+name: build-apk
+
+on: 
+  workflow_dispatch:
+jobs:
+  build:
+    if: github.repository_owner == github.actor
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: setup JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 17
+        
+    - name: build  your app
+      shell: bash
+      run: |
+        function set_env() { echo "$1=$2" >> $GITHUB_ENV; }
+        chmod +x gradlew   
+        ./gradlew assembleRelease --build-cache --parallel --daemon --warning-mode all
+        APP_BUILD_APK=$(find $GITHUB_WORKSPACE/app/build/outputs -name "*.apk")
+        set_env APP_UPLOAD_NAME app
+        set_env APP_UPLOAD ${APP_BUILD_APK%/*}
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: ${{ env.APP_UPLOAD_NAME }}
+        path: ${{ env.APP_UPLOAD }}
+        
