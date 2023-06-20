@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.peter.landing"
-        minSdk 28
+        minSdk 27
         targetSdk 33
         versionCode 29
         versionName "2.0.3"
